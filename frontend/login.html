@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign In — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-card">
+    <h1>Family Health Record</h1>
+    <p class="sub">Sign in with a magic link — no password needed.</p>
+    <div id="msg-sent" style="display:none">
+      <div class="alert-banner success">Magic link sent! Check your email and click the link to sign in.</div>
+    </div>
+    <div id="form-section">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email address</label>
+        <input class="form-control" type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="signin-btn" onclick="handleSignIn()">Send Magic Link</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:20px;text-align:center">
+      Your health data is private and accessible only to you.
+    </p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  // If already logged in, go to dashboard
+  const session = await handleAuthRedirect();
+  if (session) window.location.href = "/index.html";
+})();
+
+async function handleSignIn() {
+  const email = document.getElementById("email").value.trim();
+  if (!email) { showError("Enter your email address"); return; }
+  const btn = document.getElementById("signin-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  hideError();
+  try {
+    await sendMagicLink(email);
+    document.getElementById("form-section").style.display = "none";
+    document.getElementById("msg-sent").style.display = "block";
+  } catch (err) {
+    showError(err.message || "Failed to send magic link");
+    btn.disabled = false;
+    btn.textContent = "Send Magic Link";
+  }
+}
+</script>
+</body>
+</html>

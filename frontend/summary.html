@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doctor Summary — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  @media print {
+    .sidebar, .topbar, .no-print { display: none !important; }
+    .main { margin-left: 0 !important; }
+    .content { padding: 0 !important; }
+    #print-header { display: block !important; }
+  }
+  #print-header { display: none; margin-bottom: 20px; }
+  #print-header h1 { font-size: 20px; }
+  #print-header p { font-size: 12px; color: #666; }
+  .summary-section { margin-bottom: 20px; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; background: #E0ECFF; color: #003D80; margin: 2px; }
+  .tag.allergy { background: #FFE8E9; color: #8B1E26; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <h2>Doctor Handoff Summary</h2>
+      <div class="topbar-actions no-print">
+        <select class="form-control" id="f-member" onchange="loadSummary()" style="min-width:180px"><option value="">Select member</option></select>
+        <button class="btn btn-secondary" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+
+      <div id="summary-content" style="display:none;max-width:760px">
+        <!-- Print header -->
+        <div id="print-header">
+          <h1>Health Summary</h1>
+          <p id="ph-generated"></p>
+        </div>
+
+        <!-- Member info -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Patient</h3></div>
+          <div class="card-body" id="s-member"></div>
+        </div>
+
+        <!-- Allergies -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Known Allergies</h3></div>
+          <div class="card-body" id="s-allergies"><span style="color:var(--text-muted)">None recorded</span></div>
+        </div>
+
+        <!-- Active conditions -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Conditions / Diagnoses</h3></div>
+          <div class="card-body" id="s-conditions"><span style="color:var(--text-muted)">None recorded</span></div>
+        </div>
+
+        <!-- Active medicines -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Current Medicines</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Medicine</th><th>Generic</th><th>Dose</th><th>Frequency</th><th>Since</th></tr></thead>
+              <tbody id="s-medicines"><tr><td colspan="5" style="color:var(--text-muted);padding:16px">None recorded</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent abnormal labs -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Recent Abnormal Lab Values <span style="font-size:11px;font-weight:400">(last 90 days)</span></h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Value</th><th>Unit</th><th>Reference</th><th>Date</th></tr></thead>
+              <tbody id="s-labs"><tr><td colspan="5" style="color:var(--success);padding:16px">All values normal</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Active alerts -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Active Alerts</h3></div>
+          <div id="s-alerts"><div style="padding:16px;color:var(--text-muted)">None</div></div>
+        </div>
+
+        <div class="ai-disclaimer" style="margin-top:16px">
+          This summary is generated from uploaded documents and AI extraction. It is informational only.
+          All clinical decisions must be made by a qualified healthcare professional.
+          AI-extracted data has not been verified by a physician.
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>Select a family member</h3>
+        <p>Generate a one-page printable health summary for your doctor visit.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/summary.js"></script>
+</body>
+</html>

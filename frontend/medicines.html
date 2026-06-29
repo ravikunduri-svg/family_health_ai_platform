@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Medicines — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <h2>Medicines</h2>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAddModal()">+ Add Medicine</button></div>
+    </div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+      <div class="filters">
+        <select class="form-control" id="f-member" onchange="loadMeds()"><option value="">All Members</option></select>
+        <select class="form-control" id="f-active" onchange="loadMeds()">
+          <option value="">All</option><option value="true">Active only</option><option value="false">Past only</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Brand Name</th><th>Generic</th><th>Dose</th><th>Frequency</th><th>Member</th><th>Prescribed</th><th>Status</th><th></th></tr></thead>
+            <tbody id="med-body"><tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted)">Loading...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="ai-disclaimer" style="margin:0 16px 12px">Medicine data may include AI-extracted entries. Verify against original prescription. Not for clinical use without physician review.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Medicine Modal -->
+<div class="modal-overlay" id="med-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-header"><h3>Add Medicine</h3><button class="modal-close" onclick="document.getElementById('med-modal').style.display='none'">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Family Member *</label><select class="form-control" id="m-member"><option value="">Select</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Brand Name</label><input class="form-control" id="m-brand" placeholder="e.g. Glycomet 500"></div>
+        <div class="form-group"><label class="form-label">Generic Name</label><input class="form-control" id="m-generic" placeholder="e.g. Metformin"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Dosage</label><input class="form-control" id="m-dose" placeholder="e.g. 500mg"></div>
+        <div class="form-group"><label class="form-label">Frequency</label><input class="form-control" id="m-freq" placeholder="e.g. twice daily"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Prescribed Date</label><input class="form-control" type="date" id="m-date"></div>
+        <div class="form-group"><label class="form-label">Duration (days)</label><input class="form-control" type="number" id="m-duration" placeholder="Leave blank if ongoing"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Prescribed By</label><input class="form-control" id="m-doctor" placeholder="Doctor name"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="m-active"><option value="true">Active</option><option value="false">Discontinued</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('med-modal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMed()">Save</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/medicines.js"></script>
+</body>
+</html>

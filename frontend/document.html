@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Document — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <h2 id="doc-title">Document</h2>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="reprocess()">Re-extract</button>
+        <a id="view-file-btn" href="#" target="_blank" class="btn btn-secondary btn-sm">View File</a>
+        <button class="btn btn-danger btn-sm" onclick="deleteDoc()">Delete</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+
+      <div class="grid-2">
+        <!-- Left: file viewer + meta -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Document Info</h3></div>
+            <div class="card-body" id="doc-meta">Loading...</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>File Preview</h3></div>
+            <div class="card-body" id="file-preview-area" style="min-height:200px">
+              <div style="text-align:center;color:var(--text-muted);padding:40px">Loading file...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: extracted data -->
+        <div>
+          <!-- Extraction status -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Extraction Status</h3></div>
+            <div class="card-body">
+              <div id="ocr-status-badge"></div>
+            </div>
+          </div>
+
+          <!-- Lab values -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Lab Values</h3><span id="lab-count" class="badge badge-info">0</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Test</th><th>Value</th><th>Unit</th><th>Reference</th><th>Status</th><th></th></tr></thead>
+                <tbody id="lab-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted)">No lab values extracted</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AI-extracted medicines -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h3>Medicines</h3><span id="med-count" class="badge badge-info">0</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Brand</th><th>Generic</th><th>Dose</th><th>Frequency</th><th>Active</th></tr></thead>
+                <tbody id="med-body"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-muted)">No medicines extracted</td></tr></tbody>
+              </table>
+            </div>
+            <div class="ai-disclaimer">For information only. Verify AI-extracted medicines against original prescription. Consult a qualified healthcare professional for clinical decisions.</div>
+          </div>
+
+          <!-- AI-extracted events/diagnoses -->
+          <div class="card">
+            <div class="card-header"><h3>Health Events / Diagnoses</h3><span id="evt-count" class="badge badge-info">0</span></div>
+            <div id="events-list" style="padding:10px 0">
+              <div style="text-align:center;color:var(--text-muted);padding:20px">No events extracted</div>
+            </div>
+            <div class="ai-disclaimer">AI-extracted diagnoses are informational only. Not a clinical diagnosis. Consult your physician.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/document.js"></script>
+</body>
+</html>

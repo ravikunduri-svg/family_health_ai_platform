@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: family-health-record-api
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: "apt-get install -y tesseract-ocr libpoppler-cpp-dev && pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ENVIRONMENT
+        value: production

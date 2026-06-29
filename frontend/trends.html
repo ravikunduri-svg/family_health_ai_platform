@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trends — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar"><h2>Lab Trends</h2></div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div class="filters" style="margin-bottom:0">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Family Member</label>
+              <select class="form-control" id="f-member" onchange="onMemberChange()"><option value="">Select member</option></select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Lab Test</label>
+              <select class="form-control" id="f-test" onchange="loadTrend()"><option value="">Select test</option></select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">From</label>
+              <input class="form-control" type="date" id="f-from" onchange="loadTrend()">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">To</label>
+              <input class="form-control" type="date" id="f-to" onchange="loadTrend()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="chart-card" style="display:none">
+        <div class="card-header">
+          <h3 id="chart-title">—</h3>
+          <span id="chart-unit" class="badge badge-info"></span>
+        </div>
+        <div class="card-body">
+          <canvas id="trend-chart" height="100"></canvas>
+          <div id="trend-table-wrap" style="margin-top:20px">
+            <table>
+              <thead><tr><th>Date</th><th>Value</th><th>Unit</th><th>Reference Range</th><th>Status</th></tr></thead>
+              <tbody id="trend-table-body"></tbody>
+            </table>
+          </div>
+          <div class="ai-disclaimer" style="margin-top:12px">Trend data is informational only. Consult a qualified healthcare professional for clinical interpretation.</div>
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">📈</div>
+        <h3>Select a member and lab test</h3>
+        <p>View how a lab value has changed over time across all uploaded reports.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/trends.js"></script>
+</body>
+</html>

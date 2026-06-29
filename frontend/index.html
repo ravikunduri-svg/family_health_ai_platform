@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2>Dashboard</h2>
+      <div class="topbar-actions">
+        <a href="upload.html" class="btn btn-primary">+ Upload Document</a>
+      </div>
+    </div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+
+      <!-- Stats row -->
+      <div class="grid-4" style="margin-bottom:24px" id="stats-row">
+        <div class="stat-card"><div class="stat-label">Family Members</div><div class="stat-value" id="stat-members">—</div></div>
+        <div class="stat-card danger"><div class="stat-label">Active Alerts</div><div class="stat-value" id="stat-alerts">—</div></div>
+        <div class="stat-card"><div class="stat-label">Documents</div><div class="stat-value" id="stat-docs">—</div></div>
+        <div class="stat-card warning"><div class="stat-label">Active Medicines</div><div class="stat-value" id="stat-meds">—</div></div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Member cards -->
+        <div class="card">
+          <div class="card-header"><h3>Family Members</h3><a href="members.html" class="btn btn-sm btn-secondary">Manage</a></div>
+          <div class="card-body" id="member-cards">
+            <div class="empty-state"><div class="empty-icon">👥</div><h3>No members yet</h3><p><a href="members.html">Add family members</a> to get started.</p></div>
+          </div>
+        </div>
+
+        <!-- Recent alerts -->
+        <div class="card">
+          <div class="card-header"><h3>Active Alerts</h3><a href="alerts.html" class="btn btn-sm btn-secondary">View all</a></div>
+          <div id="alerts-list">
+            <div class="empty-state" style="padding:30px"><div class="empty-icon">✅</div><h3>No active alerts</h3></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent documents -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header"><h3>Recent Documents</h3><a href="documents.html" class="btn btn-sm btn-secondary">View all</a></div>
+        <div class="table-wrap">
+          <table id="docs-table">
+            <thead><tr><th>Title</th><th>Member</th><th>Type</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="docs-body"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:30px">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
