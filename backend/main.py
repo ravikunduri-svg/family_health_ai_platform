@@ -30,6 +30,7 @@ app = FastAPI(
 
 # CORS — locked to the configured origin in production
 _cors_origins = [o.strip() for o in os.getenv("CORS_ORIGIN", "http://localhost:5500").split(",")]
+log.info("CORS allowed origins: %s", _cors_origins)
 
 app.add_middleware(
     CORSMiddleware,
