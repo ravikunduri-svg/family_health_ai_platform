@@ -161,6 +161,32 @@ function setNavActive() {
     const href = a.getAttribute("href").split("/").pop();
     a.classList.toggle("active", href === path);
   });
+  _initMobileNav();
+}
+
+function _initMobileNav() {
+  const sidebar = document.querySelector(".sidebar");
+  const topbar  = document.querySelector(".topbar");
+  if (!sidebar || !topbar) return;
+
+  // Overlay
+  const overlay = document.createElement("div");
+  overlay.className = "sidebar-overlay";
+  document.body.appendChild(overlay);
+
+  // Hamburger button
+  const toggle = document.createElement("button");
+  toggle.className = "menu-toggle";
+  toggle.setAttribute("aria-label", "Menu");
+  toggle.innerHTML = "&#9776;";
+  topbar.insertBefore(toggle, topbar.firstChild);
+
+  function openMenu()  { sidebar.classList.add("open");  overlay.classList.add("open"); }
+  function closeMenu() { sidebar.classList.remove("open"); overlay.classList.remove("open"); }
+
+  toggle.addEventListener("click", () => sidebar.classList.contains("open") ? closeMenu() : openMenu());
+  overlay.addEventListener("click", closeMenu);
+  sidebar.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
 }
 
 async function showUserEmail() {
