@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  .search-bar { display: flex; gap: 10px; margin-bottom: 8px; }
+  .search-bar input { flex: 1; font-size: 15px; }
+  .search-filters { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .search-filters label { font-size: 13px; color: var(--text-muted); }
+  .result-item { display: flex; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--border); align-items: flex-start; cursor: pointer; transition: background 0.1s; }
+  .result-item:hover { background: var(--bg); }
+  .result-type-badge { min-width: 80px; text-align: center; }
+  .result-body { flex: 1; }
+  .result-title { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+  .result-meta { font-size: 12px; color: var(--text-muted); }
+  .result-date { font-size: 12px; color: var(--text-muted); min-width: 90px; text-align: right; padding-top: 2px; }
+  .type-icon { font-size: 20px; margin-bottom: 2px; }
+  .results-count { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+      <a href="ask.html"><span class="nav-icon">🤖</span>Ask AI</a>
+      <a href="search.html"><span class="nav-icon">🔍</span>Search</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar"><h2>Search Health Records</h2></div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-body">
+          <div class="search-bar">
+            <input class="form-control" type="search" id="search-input"
+              placeholder="Search medicines, diagnoses, lab tests, documents..."
+              onkeydown="if(event.key==='Enter') doSearch()">
+            <button class="btn btn-primary" onclick="doSearch()">Search</button>
+          </div>
+          <div class="search-filters">
+            <label>Filter by member:</label>
+            <select class="form-control" id="f-member" style="max-width:200px" onchange="doSearch()">
+              <option value="">All members</option>
+            </select>
+            <label style="margin-left:12px">Type:</label>
+            <select class="form-control" id="f-type" style="max-width:160px" onchange="filterResults()">
+              <option value="">All types</option>
+              <option value="document">Documents</option>
+              <option value="medicine">Medicines</option>
+              <option value="event">Health Events</option>
+              <option value="lab_value">Lab Values</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="results-section" style="display:none">
+        <div class="results-count" id="results-count"></div>
+        <div class="card">
+          <div id="results-list"></div>
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Search your health records</h3>
+        <p>Find medicines, diagnoses, lab results, and documents across all family members.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+const TYPE_META = {
+  document:  { icon: "📄", label: "Document",  color: "#E0ECFF", text: "#003D80", href: r => `document.html?id=${r.id}` },
+  medicine:  { icon: "💊", label: "Medicine",  color: "#E8F5E9", text: "#1B5E20", href: r => `medicines.html` },
+  event:     { icon: "📅", label: "Event",     color: "#FFF3E0", text: "#7B3F00", href: r => `timeline.html` },
+  lab_value: { icon: "🧪", label: "Lab Value", color: "#F3E5F5", text: "#4A148C", href: r => `trends.html` },
+};
+
+let _allResults = [];
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  setNavActive();
+  showUserEmail();
+
+  try {
+    const members = await api.getMembers() || [];
+    const sel = document.getElementById("f-member");
+    members.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    });
+  } catch (err) {
+    showError("Failed to load members: " + err.message);
+  }
+
+  // Pre-fill from URL ?q=
+  const urlQ = new URLSearchParams(window.location.search).get("q");
+  if (urlQ) {
+    document.getElementById("search-input").value = urlQ;
+    doSearch();
+  }
+})();
+
+window.doSearch = async function() {
+  const q = document.getElementById("search-input").value.trim();
+  if (!q) return;
+  const memberId = document.getElementById("f-member").value;
+
+  document.getElementById("empty-state").style.display = "none";
+  document.getElementById("results-section").style.display = "none";
+  document.getElementById("results-count").textContent = "Searching...";
+  document.getElementById("results-section").style.display = "block";
+  document.getElementById("results-list").innerHTML = "";
+  hideError();
+
+  try {
+    const res = await api.search(q, memberId || null);
+    _allResults = res.results || [];
+    filterResults();
+  } catch (err) {
+    showError(err.message || "Search failed");
+    document.getElementById("results-section").style.display = "none";
+    document.getElementById("empty-state").style.display = "flex";
+  }
+};
+
+window.filterResults = function() {
+  const typeFilter = document.getElementById("f-type").value;
+  const filtered = typeFilter ? _allResults.filter(r => r.entity_type === typeFilter) : _allResults;
+
+  const countEl = document.getElementById("results-count");
+  const listEl = document.getElementById("results-list");
+
+  if (!filtered.length) {
+    countEl.textContent = "No results found";
+    listEl.innerHTML = `<div class="empty-state" style="padding:40px"><div class="empty-icon">🔍</div><h3>No results</h3><p>Try a different search term or remove filters.</p></div>`;
+    return;
+  }
+
+  countEl.textContent = `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`;
+  listEl.innerHTML = filtered.map(r => {
+    const meta = TYPE_META[r.entity_type] || { icon: "📌", label: r.entity_type, color: "#eee", text: "#333", href: () => "#" };
+    return `
+      <div class="result-item" onclick="window.location.href='${meta.href(r)}'">
+        <div class="result-type-badge">
+          <div class="type-icon">${meta.icon}</div>
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${meta.color};color:${meta.text};font-weight:600">${meta.label}</span>
+        </div>
+        <div class="result-body">
+          <div class="result-title">${r.title}</div>
+          ${r.snippet ? `<div class="result-meta">${r.snippet}</div>` : ""}
+        </div>
+        <div class="result-date">${r.date ? formatDate(r.date) : ""}</div>
+      </div>
+    `;
+  }).join("");
+};
+</script>
+</body>
+</html>
