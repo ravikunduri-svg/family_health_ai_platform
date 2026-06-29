@@ -1,4 +1,6 @@
 {
+  "buildCommand": null,
+  "outputDirectory": "frontend",
   "rewrites": [
     { "source": "/", "destination": "/login.html" }
   ],
