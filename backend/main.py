@@ -13,7 +13,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from routes import members, documents, lab_values, medicines, events, alerts, trends, summary, search
+from routes import members, documents, lab_values, medicines, events, alerts, trends, summary, search, ask
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,3 +63,4 @@ app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
 app.include_router(trends.router, prefix="/api/trends", tags=["trends"])
 app.include_router(summary.router, prefix="/api/summary", tags=["summary"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
+app.include_router(ask.router, prefix="/api/ask", tags=["ask"])

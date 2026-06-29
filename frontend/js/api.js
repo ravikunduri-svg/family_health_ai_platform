@@ -123,6 +123,9 @@ const api = {
 
   // Search
   search: (q, memberId) => apiFetch("/api/search?" + new URLSearchParams({ q, ...(memberId ? { member_id: memberId } : {}) }).toString()),
+
+  // Ask
+  ask: (memberId, q) => apiFetch("/api/ask?" + new URLSearchParams({ member_id: memberId, q }).toString()),
 };
 
 // ── UI helpers ────────────────────────────────────────────────────

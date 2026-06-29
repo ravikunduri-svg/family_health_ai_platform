@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Your Health Records — Family Health Record</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  .ask-wrap { max-width: 720px; }
+  .ask-input-row { display: flex; gap: 10px; margin-bottom: 24px; }
+  .ask-input-row input { flex: 1; }
+  .answer-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
+  .answer-box .answer-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .answer-text { font-size: 15px; line-height: 1.65; color: var(--text); }
+  .sources-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sources-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+  .source-chip { display: inline-block; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 12px; margin: 3px 3px 3px 0; color: var(--text-muted); }
+  .source-chip span { color: var(--primary); font-weight: 500; }
+  .question-label { font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .question-text { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; font-style: italic; }
+  .example-qs { margin-bottom: 24px; }
+  .example-qs p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .example-chip { display: inline-block; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 13px; cursor: pointer; margin: 4px; color: var(--text); transition: border-color 0.15s; }
+  .example-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .disclaimer { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><h1>Family Health Record</h1><p>Your Health OS</p></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span>Dashboard</a>
+      <a href="members.html"><span class="nav-icon">👥</span>Family Members</a>
+      <a href="upload.html"><span class="nav-icon">📤</span>Upload</a>
+      <a href="documents.html"><span class="nav-icon">📄</span>Documents</a>
+      <a href="timeline.html"><span class="nav-icon">📅</span>Timeline</a>
+      <a href="medicines.html"><span class="nav-icon">💊</span>Medicines</a>
+      <a href="trends.html"><span class="nav-icon">📈</span>Trends</a>
+      <a href="alerts.html"><span class="nav-icon">🔔</span>Alerts</a>
+      <a href="summary.html"><span class="nav-icon">📋</span>Doctor Summary</a>
+      <a href="ask.html"><span class="nav-icon">🤖</span>Ask AI</a>
+    </div>
+    <div class="sidebar-footer"><div class="user-email"></div><a href="#" onclick="signOut()" style="color:#6B85AC;font-size:12px">Sign out</a></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <h2>Ask Your Health Records</h2>
+    </div>
+    <div class="content">
+      <div id="error-banner" class="alert-banner error" style="display:none"></div>
+      <div class="ask-wrap">
+
+        <!-- Member selector -->
+        <div class="form-group" style="margin-bottom:20px">
+          <label class="form-label">Family member</label>
+          <select class="form-control" id="member-select" style="max-width:300px">
+            <option value="">Loading members...</option>
+          </select>
+        </div>
+
+        <!-- Example questions -->
+        <div class="example-qs">
+          <p>Try asking:</p>
+          <span class="example-chip" onclick="setQ(this)">When was I diagnosed with high sugar?</span>
+          <span class="example-chip" onclick="setQ(this)">From when am I using Maxtra syrup?</span>
+          <span class="example-chip" onclick="setQ(this)">What is my latest HbA1c value?</span>
+          <span class="example-chip" onclick="setQ(this)">Which medicines am I currently taking?</span>
+          <span class="example-chip" onclick="setQ(this)">What was my blood pressure trend?</span>
+          <span class="example-chip" onclick="setQ(this)">Have I had any hospitalizations?</span>
+        </div>
+
+        <!-- Question input -->
+        <div class="ask-input-row">
+          <input class="form-control" type="text" id="question-input"
+            placeholder="Ask anything about your health records..."
+            onkeydown="if(event.key==='Enter') askQuestion()">
+          <button class="btn btn-primary" id="ask-btn" onclick="askQuestion()">Ask</button>
+        </div>
+
+        <!-- Answer -->
+        <div id="answer-section" style="display:none">
+          <div class="answer-box">
+            <div class="question-label">Your question</div>
+            <div class="question-text" id="displayed-question"></div>
+            <div class="answer-label">Answer</div>
+            <div class="answer-text" id="answer-text"></div>
+            <div id="sources-section" class="sources-section" style="display:none">
+              <div class="sources-label">Based on</div>
+              <div id="sources-list"></div>
+            </div>
+          </div>
+          <p class="disclaimer">For information only. Consult a qualified healthcare professional for clinical decisions.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  setNavActive();
+  showUserEmail();
+
+  // Load members into selector
+  try {
+    const members = await api.getMembers();
+    const sel = document.getElementById("member-select");
+    if (!members || !members.length) {
+      sel.innerHTML = '<option value="">No members — add one first</option>';
+      return;
+    }
+    sel.innerHTML = members.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+  } catch (err) {
+    showError("Failed to load members: " + err.message);
+  }
+})();
+
+function setQ(el) {
+  document.getElementById("question-input").value = el.textContent;
+  document.getElementById("question-input").focus();
+}
+
+async function askQuestion() {
+  const memberId = document.getElementById("member-select").value;
+  const q = document.getElementById("question-input").value.trim();
+  if (!memberId) { showError("Select a family member first"); return; }
+  if (!q) { showError("Enter a question"); return; }
+
+  const btn = document.getElementById("ask-btn");
+  btn.disabled = true;
+  btn.textContent = "Thinking...";
+  hideError();
+  document.getElementById("answer-section").style.display = "none";
+
+  try {
+    const res = await api.ask(memberId, q);
+    document.getElementById("displayed-question").textContent = res.question;
+    document.getElementById("answer-text").textContent = res.answer;
+
+    // Sources
+    const srcSection = document.getElementById("sources-section");
+    const srcList = document.getElementById("sources-list");
+    if (res.sources && res.sources.length) {
+      srcList.innerHTML = res.sources.map(s =>
+        `<span class="source-chip"><span>${s.type}</span> · ${s.title}${s.date ? " · " + formatDate(s.date) : ""}</span>`
+      ).join("");
+      srcSection.style.display = "block";
+    } else {
+      srcSection.style.display = "none";
+    }
+
+    document.getElementById("answer-section").style.display = "block";
+  } catch (err) {
+    showError(err.message || "Failed to get answer");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Ask";
+  }
+}
+</script>
+</body>
+</html>
