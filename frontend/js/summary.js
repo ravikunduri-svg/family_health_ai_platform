@@ -87,6 +87,35 @@
         `).join("")
       : `<tr><td colspan="5" style="color:var(--success);padding:16px">All values normal in last 90 days</td></tr>`;
 
+    // All recent labs
+    const allLabsTbody = document.getElementById("s-labs-all");
+    allLabsTbody.innerHTML = s.recent_labs_all && s.recent_labs_all.length
+      ? s.recent_labs_all.map(l => `
+          <tr>
+            <td style="font-weight:500">${l.test_name}</td>
+            <td class="${l.is_abnormal ? 'lab-value-abnormal' : ''}">${l.value}</td>
+            <td>${l.unit || "—"}</td>
+            <td>${l.reference_low != null && l.reference_high != null ? l.reference_low + " – " + l.reference_high : "—"}</td>
+            <td>${formatDate(l.report_date)}</td>
+            <td>${l.is_abnormal ? '<span class="badge badge-danger">Abnormal</span>' : '<span style="color:var(--success);font-size:12px">Normal</span>'}</td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="6" style="color:var(--text-muted);padding:16px">No lab results in last 90 days</td></tr>`;
+
+    // Health history events
+    const eventsEl = document.getElementById("s-events");
+    eventsEl.innerHTML = s.recent_events && s.recent_events.length
+      ? s.recent_events.map(e => `
+          <div style="display:flex;gap:16px;padding:10px 20px;border-bottom:1px solid var(--border);align-items:flex-start">
+            <div style="min-width:90px;font-size:12px;color:var(--text-muted);padding-top:2px">${formatDate(e.event_date)}</div>
+            <div>
+              <div style="font-weight:500">${e.title}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${e.event_type || ""}${e.doctor_name ? " · " + e.doctor_name : ""}${e.facility_name ? " · " + e.facility_name : ""}</div>
+            </div>
+          </div>
+        `).join("")
+      : `<div style="padding:16px;color:var(--text-muted)">No health events recorded</div>`;
+
     // Active alerts
     const alertEl = document.getElementById("s-alerts");
     alertEl.innerHTML = s.active_alerts.length

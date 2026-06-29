@@ -86,13 +86,30 @@
 
         <!-- Recent abnormal labs -->
         <div class="card summary-section">
-          <div class="card-header"><h3>Recent Abnormal Lab Values <span style="font-size:11px;font-weight:400">(last 90 days)</span></h3></div>
+          <div class="card-header"><h3>Abnormal Lab Values <span style="font-size:11px;font-weight:400">(last 90 days)</span></h3></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Value</th><th>Unit</th><th>Reference</th><th>Date</th></tr></thead>
               <tbody id="s-labs"><tr><td colspan="5" style="color:var(--success);padding:16px">All values normal</td></tr></tbody>
             </table>
           </div>
+        </div>
+
+        <!-- All recent labs -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>All Recent Lab Results <span style="font-size:11px;font-weight:400">(last 90 days)</span></h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Value</th><th>Unit</th><th>Reference</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="s-labs-all"><tr><td colspan="6" style="color:var(--text-muted);padding:16px">No lab results in last 90 days</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Health history -->
+        <div class="card summary-section">
+          <div class="card-header"><h3>Health History</h3></div>
+          <div id="s-events"><div style="padding:16px;color:var(--text-muted)">No events recorded</div></div>
         </div>
 
         <!-- Active alerts -->

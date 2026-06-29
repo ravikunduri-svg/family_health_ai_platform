@@ -28,18 +28,20 @@ async def get_summary(
     # Active medicines
     med_res = db.table("medicines").select("*").eq("member_id", str(member_id)).eq("is_active", True).order("prescribed_date", desc=True).execute()
 
-    # Recent abnormal lab values (last 90 days)
+    # Recent lab values (last 90 days) — all + abnormal-only subsets
     from datetime import timedelta
     cutoff = (datetime.utcnow() - timedelta(days=90)).date().isoformat()
-    lab_res = (
+    lab_all_res = (
         db.table("lab_values")
         .select("*")
         .eq("member_id", str(member_id))
-        .eq("is_abnormal", True)
         .gte("report_date", cutoff)
         .order("report_date", desc=True)
+        .limit(60)
         .execute()
     )
+    all_labs = lab_all_res.data or []
+    lab_res_data = [l for l in all_labs if l.get("is_abnormal")]
 
     # Health events (most recent 20)
     evt_res = (
@@ -74,7 +76,8 @@ async def get_summary(
     return {
         "member": member,
         "active_medicines": med_res.data or [],
-        "recent_lab_abnormals": lab_res.data or [],
+        "recent_lab_abnormals": lab_res_data,
+        "recent_labs_all": all_labs,
         "conditions": conditions,
         "allergies": list(member.get("allergies") or []),
         "recent_events": evt_res.data or [],

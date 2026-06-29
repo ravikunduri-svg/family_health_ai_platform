@@ -262,6 +262,7 @@ class SummaryResponse(BaseModel):
     member: MemberResponse
     active_medicines: list[MedicineResponse]
     recent_lab_abnormals: list[LabValueResponse]
+    recent_labs_all: list[LabValueResponse]
     conditions: list[str]         # from chronic_conditions + diagnosed events
     allergies: list[str]
     recent_events: list[EventResponse]
