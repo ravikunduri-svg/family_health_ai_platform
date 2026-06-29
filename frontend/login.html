@@ -20,6 +20,12 @@
         <input class="form-control" type="email" id="email" placeholder="you@example.com" autocomplete="email">
       </div>
       <button class="btn btn-primary" style="width:100%" id="signin-btn" onclick="handleSignIn()">Send Magic Link</button>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+        <hr style="flex:1;border:none;border-top:1px solid var(--border)">
+        <span style="font-size:12px;color:var(--text-muted)">or</span>
+        <hr style="flex:1;border:none;border-top:1px solid var(--border)">
+      </div>
+      <button class="btn btn-secondary" style="width:100%" id="guest-btn" onclick="handleGuestSignIn()">Continue as Guest (Demo)</button>
     </div>
     <p style="font-size:11px;color:var(--text-muted);margin-top:20px;text-align:center">
       Your health data is private and accessible only to you.
@@ -35,6 +41,23 @@
   const session = await handleAuthRedirect();
   if (session) window.location.href = "/index.html";
 })();
+
+async function handleGuestSignIn() {
+  const btn = document.getElementById("guest-btn");
+  btn.disabled = true;
+  btn.textContent = "Signing in...";
+  hideError();
+  try {
+    const { GUEST_EMAIL, GUEST_PASSWORD } = window.APP_CONFIG;
+    const { data, error } = await _supa.auth.signInWithPassword({ email: GUEST_EMAIL, password: GUEST_PASSWORD });
+    if (error) throw error;
+    window.location.href = "/index.html";
+  } catch (err) {
+    showError(err.message || "Guest sign-in failed");
+    btn.disabled = false;
+    btn.textContent = "Continue as Guest (Demo)";
+  }
+}
 
 async function handleSignIn() {
   const email = document.getElementById("email").value.trim();
