@@ -69,7 +69,7 @@ def extract_unstructured(raw_text: str) -> dict[str, Any]:
         return _empty_extraction()
 
     truncated = raw_text[:_MAX_INPUT_CHARS]
-    prompt = _EXTRACTION_PROMPT.format(text=truncated)
+    prompt = _EXTRACTION_PROMPT.replace("{text}", truncated)
 
     try:
         client = Groq(api_key=api_key)
@@ -79,11 +79,20 @@ def extract_unstructured(raw_text: str) -> dict[str, Any]:
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = completion.choices[0].message.content.strip()
-        # Strip accidental markdown fences
-        if response_text.startswith("```"):
-            lines = response_text.split("\n")
-            response_text = "\n".join(lines[1:-1])
-        result = json.loads(response_text)
+        log.debug("AI extractor raw response (first 200 chars): %s", response_text[:200])
+
+        # Extract JSON object from response — handles markdown fences and preamble text
+        import re as _re
+        json_match = _re.search(r"\{.*\}", response_text, _re.DOTALL)
+        if not json_match:
+            log.error("AI extractor: no JSON object found in Groq response")
+            return _empty_extraction()
+        json_text = json_match.group(0)
+
+        result = json.loads(json_text)
+        if not isinstance(result, dict):
+            log.error("AI extractor: parsed JSON is not a dict (got %s)", type(result).__name__)
+            return _empty_extraction()
         return _validate_structure(result)
     except json.JSONDecodeError as exc:
         log.error("AI extractor: Groq returned invalid JSON — %s", exc)

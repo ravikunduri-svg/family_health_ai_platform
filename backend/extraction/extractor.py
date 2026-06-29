@@ -87,7 +87,8 @@ def process_document(
         _set_status(document_id, "done")
 
     except Exception as exc:
-        log.error("doc %s extraction failed: %s — %s", document_id, type(exc).__name__, exc)
+        import traceback
+        log.error("doc %s extraction failed: %s — %s\n%s", document_id, type(exc).__name__, exc, traceback.format_exc())
         _set_status(document_id, "failed")
 
 
